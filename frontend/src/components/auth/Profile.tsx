@@ -18,6 +18,7 @@ const Profile = () => {
                 user && (
                     <Fragment>
                         <img src={user.picture} alt="Profile" className="w-40 rounded-full"/>
+                        <p>ID: {user.sub}</p>
                         <p>{user.email}</p>
                     </Fragment>
                 )
