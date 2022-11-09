@@ -12,7 +12,7 @@ require('dotenv').config()
 const uri = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.rykoqfm.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
 
-app.post('/add', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image'), async (req, res) => {
+app.post('/item', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image'), async (req, res) => {
     if(req.file){
         const base64Data = req.file.buffer.toString('base64')
         
