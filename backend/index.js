@@ -55,13 +55,32 @@ app.post('/item', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image'),
     }
 })
 
+app.patch('/item', async (req, res) => {
+    let id = req.body.id
+    let itemId = req.body.item.id
+    let itemName = req.body.item.name
+    let itemDescription = req.body.item.description
+
+    let result = await editItem(id, itemId, itemName, itemDescription)
+
+    if(result.acknowledged && result.matchedCount){
+        res.sendStatus(200)
+    } else{
+        res.sendStatus(500)
+    }
+})
+
 app.get('/user/:id', async (req, res) => {
     let id = req.params.id
     let user = await getUser(id)
-    res.send({
-        status: 200,
-        user
-    })
+    if(user){
+        res.send({
+            status: 200,
+            user
+        })
+    } else{
+        res.sendStatus(404)
+    }
 })
 
 app.listen(port, () => {
@@ -94,7 +113,30 @@ async function addItemToUser(userId, userEmail, imageId, imageUrl, imageName, im
     } catch(e){
         return e
     } finally {
-        await client.close();
+        //await client.close();
+    }
+}
+
+async function editItem(userId, itemId, itemName, itemDescription){
+    try {
+        const database = client.db('trader');
+        const users = database.collection('users');
+
+        const result = users.updateOne(
+            {
+                userId: userId,
+                "items.id": itemId
+            }, 
+            {
+                $set: {
+                    "items.$.name": itemName,
+                    "items.$.description": itemDescription,
+                }
+            }, false);
+        
+        return result
+    } finally {
+        //await client.close();
     }
 }
 
@@ -107,6 +149,6 @@ async function getUser(userId){
         
         return user
     } finally {
-        await client.close();
+        //await client.close();
     }
 }
