@@ -1,13 +1,14 @@
 const { MongoClient } = require("mongodb");
 const express = require('express')
 const multer = require('multer')
-const app = express()
-const port = 3030
-app.use(express.json())
 var axios = require('axios')
 var FormData = require('form-data');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config()
+
+const app = express()
+const port = 3030
+app.use(express.json())
 
 const uri = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.rykoqfm.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
@@ -37,13 +38,10 @@ app.post('/item', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image'),
             const result = await addItemToUser(req.body.id, req.body.email, id, url, req.body.name, req.body.description)
             if(result.acknowledged && result.modifiedCount){
                 res.send({
-                    status: 200,
-                    item: {
-                        id,
-                        url,
-                        name: req.body.name,
-                        description: req.body.description
-                    }
+                    id,
+                    url,
+                    name: req.body.name,
+                    description: req.body.description
                 })
             }
         })
@@ -74,10 +72,7 @@ app.get('/user/:id', async (req, res) => {
     let id = req.params.id
     let user = await getUser(id)
     if(user){
-        res.send({
-            status: 200,
-            user
-        })
+        res.send(user)
     } else{
         res.sendStatus(404)
     }
@@ -112,8 +107,6 @@ async function addItemToUser(userId, userEmail, imageId, imageUrl, imageName, im
         return result
     } catch(e){
         return e
-    } finally {
-        //await client.close();
     }
 }
 
@@ -135,8 +128,8 @@ async function editItem(userId, itemId, itemName, itemDescription){
             }, false);
         
         return result
-    } finally {
-        //await client.close();
+    } catch(e){
+        return e
     }
 }
 
@@ -148,7 +141,7 @@ async function getUser(userId){
         const user = await users.findOne(filter);
         
         return user
-    } finally {
-        //await client.close();
+    } catch(e){
+        return e
     }
 }
