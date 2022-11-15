@@ -27,6 +27,7 @@ export type ItemType = {
 export const Home = () =>{
   const { user, logout } = useAuth0();
   const [userData, setUserData] = React.useState<UserItemsType>();
+  const [selectedItem, setSelectedItem] = React.useState<string>("");
   const [isProductsActive, setProductsActive] = React.useState<boolean>(true);
   const [isNotAddingProduct, setNotAddingProduct] = React.useState<boolean>(true);
   
@@ -43,6 +44,9 @@ export const Home = () =>{
       onSuccess: (res) => {
         if (res) {
           setUserData(res.data);
+          if(res.data.items?.length > 0){
+            setSelectedItem(res.data.items[0].id)
+          }
         }
       },
       onError: (err) => {
@@ -62,6 +66,7 @@ export const Home = () =>{
     newObj.items = [...newObj.items, item]
     setUserData(newObj)
     setNotAddingProduct(true)
+    if(newObj.items.length === 1) setSelectedItem(newObj.items[0].id)
   }
  }
 
@@ -77,9 +82,9 @@ export const Home = () =>{
           </div>     
         </div>
         <div className="flex flex-row py-2 pb-3 mx-4">
-          <button className={`font-semibold mr-4 ${isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
+          <button className={`font-semibold mr-6 ${isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
                   onClick={() => setProductsActive(true)}>Products</button>
-          <button className={`font-semibold ml-4 ${!isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
+          <button className={`font-semibold ${!isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
                   onClick={() => setProductsActive(false)}>Trades</button>
         </div>
         
@@ -88,7 +93,7 @@ export const Home = () =>{
               <p>Loading...</p>:
             !!userData ?
               <>
-                <ItemsList items={userData.items}/> 
+                <ItemsList items={userData.items} selectedItem={selectedItem} setSelectedItem={(id: string) => setSelectedItem(id)}/> 
                 <button onClick={()=> setNotAddingProduct(false)}className="flex w-full justify-center p-4 px-4 shadow bg-gradient-to-r from-sky-500 to-indigo-500">
                   <AiOutlinePlusCircle className="text-white" size= {40}/>
                 </button>
