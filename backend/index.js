@@ -1,4 +1,5 @@
 const { MongoClient } = require("mongodb");
+const cors = require('cors');
 const express = require('express')
 const multer = require('multer')
 const app = express()
@@ -11,6 +12,22 @@ require('dotenv').config()
 
 const uri = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.rykoqfm.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
+
+var whitelist = ['http://localhost:3000', 'https://localhost:3000']; //white list consumers
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+  optionsSuccessStatus: 200,
+  credentials: false,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'device-remember-token', 'Access-Control-Allow-Origin', 'Origin', 'Accept']
+};
+app.use(cors(corsOptions));
 
 app.post('/item', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image'), async (req, res) => {
     if(req.file){
@@ -58,10 +75,14 @@ app.post('/item', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image'),
 app.get('/user/:id', async (req, res) => {
     let id = req.params.id
     let user = await getUser(id)
-    res.send({
-        status: 200,
-        user
-    })
+    if (user) {
+        res.send({
+            status: 200,
+            user
+        })
+    } else{
+        res.sendStatus(404)
+    }
 })
 
 app.listen(port, () => {
@@ -94,7 +115,7 @@ async function addItemToUser(userId, userEmail, imageId, imageUrl, imageName, im
     } catch(e){
         return e
     } finally {
-        await client.close();
+        //await client.close();
     }
 }
 
@@ -107,6 +128,6 @@ async function getUser(userId){
         
         return user
     } finally {
-        await client.close();
+        //await client.close();
     }
 }

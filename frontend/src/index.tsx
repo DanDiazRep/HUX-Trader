@@ -4,14 +4,28 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ThemeProvider } from './theme/themeProvider';
+import { QueryClient, QueryClientProvider } from "react-query";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: false,
+      staleTime: 5*60*1000,
+    },
+  },
+});
+
 root.render(
   <React.StrictMode>
     <ThemeProvider>
+    <QueryClientProvider client={queryClient}>
       <App />
+      </QueryClientProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

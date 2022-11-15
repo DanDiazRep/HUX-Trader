@@ -1,16 +1,14 @@
 import { Navbar } from "./components/shared/NavBar";
 import { Auth0Provider } from "@auth0/auth0-react";
 import "./App.css";
-import { Landing } from "./components/Landing";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
 } from "react-router-dom";
 import Login from "./components/auth/Login";
-import Profile from "./components/auth/Profile";
-import { Container } from "./components/shared/Container";
-import { HomeSwitch } from "./components/HomeSwitch";
+import Profile from "./components/screens/profile/Profile";
+import { HomeSwitch } from "./components/screens/landing/HomeSwitch";
 
 const App = () => {
   const domain: string = process.env.REACT_APP_AUTH0_DOMAIN
@@ -23,17 +21,13 @@ const App = () => {
       redirectUri={window.location.origin}
     >
       <Router>
-        <div className="flex flex-col min-h-screen">
-          <Navbar />
-          <Container>
-            <div className="container mx-auto px-6 min-h-full">
+        <div className="relative flex flex-col h-screen w-screen">
+          <Navbar />            
               <Routes>
                 <Route path="/" element={<HomeSwitch/>}/>
                 <Route path="/login" element={<Login/>}/>
                 <Route path="/profile" element={<Profile/>}/>
-              </Routes>
-            </div>
-          </Container>
+              </Routes>          
         </div>
       </Router>
     </Auth0Provider>
