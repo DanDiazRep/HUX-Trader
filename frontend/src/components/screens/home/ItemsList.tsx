@@ -7,7 +7,7 @@ export type ItemsListType = {
 
 export const ItemsList = (items: ItemsListType) =>{
     return (
-        <div className="realtive">
+        <div className="overflow-auto">
             {items.items.map(item => 
                 <Item key={item.id} item={item}/>
                 )
@@ -21,13 +21,12 @@ export const ItemsList = (items: ItemsListType) =>{
     return (
          <div className="flex flex-row p-4 px-4 mb-4 shadow">
             <div className="flex flex-row w-fill cursor-pointer">
-             <img className="h-[90px] w-[120px] object-cover" src={item.item.url} alt="item"/>
+             <img className="h-[90px] w-[120px] object-cover rounded-md" src={item.item.url} alt="item"/>
             <p className="flex ml-4 self-center font-semibold text-black">{item.item.name}</p>   
             </div> 
             <div className="flex ml-2 rounded-2xl w-7 h-7 self-center justify-center hover:bg-[#616161] hover:invert cursor-pointer">
                 <AiOutlineEdit className="self-center font-semibold text-black "/>   
             </div>     
         </div>
- 
     );
   }

@@ -1,4 +1,3 @@
-import { Navbar } from "./components/shared/NavBar";
 import { Auth0Provider } from "@auth0/auth0-react";
 import "./App.css";
 import {
@@ -7,7 +6,6 @@ import {
   Route,
 } from "react-router-dom";
 import Login from "./components/auth/Login";
-import Profile from "./components/screens/profile/Profile";
 import { HomeSwitch } from "./components/screens/landing/HomeSwitch";
 
 const App = () => {
@@ -21,12 +19,10 @@ const App = () => {
       redirectUri={window.location.origin}
     >
       <Router>
-        <div className="relative flex flex-col h-screen w-screen">
-          <Navbar />            
+        <div className="relative flex flex-col h-screen">
               <Routes>
                 <Route path="/" element={<HomeSwitch/>}/>
                 <Route path="/login" element={<Login/>}/>
-                <Route path="/profile" element={<Profile/>}/>
               </Routes>          
         </div>
       </Router>

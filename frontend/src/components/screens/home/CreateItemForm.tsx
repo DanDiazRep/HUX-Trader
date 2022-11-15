@@ -3,7 +3,11 @@ import React from "react";
 import { useQuery } from "react-query";
 import apiClient from "../../shared/htttp-common";
 import {AiOutlinePlusCircle} from 'react-icons/ai';
+import { ItemType } from "./Home";
 
+interface Props {
+  addItemToUser: (item: ItemType) => void
+}
 
 export type CreateItemType = {
     user: User | undefined,
@@ -12,7 +16,7 @@ export type CreateItemType = {
     description: string,
 }
 
-export const CreateItemForm = () =>{
+export const CreateItemForm = ({addItemToUser}: Props) =>{
     const [name, setName] = React.useState<string>("");
     const [description, setDescription] = React.useState<string>("");
     const [imageData, setImage] = React.useState<File>();
@@ -37,10 +41,10 @@ export const CreateItemForm = () =>{
         {
           onSuccess: (res) => {
             if (res) {
-              const result = {
-                data: res.data,
-              };
-              console.log("post result", result);
+              if(res.data){
+                console.log("post result", res.data);
+                addItemToUser(res.data as ItemType)
+              }
             }
           },
           onError: (err) => {
@@ -105,7 +109,7 @@ export const CreateItemForm = () =>{
                 </label>
               </div>
               { !!description && !!name &&
-                <button className="flex content-center relative bottom-[54px] mx-32 text-white py-2 px-4 font-semibold rounded-2xl bg-gradient-to-tr from-[#fd2879] to-[#ff8941]" onClick={(e) =>createNewItem()}>Create</button>
+                <button type="button" className="flex content-center relative bottom-[54px] mx-32 text-white py-2 px-4 font-semibold rounded-2xl bg-gradient-to-tr from-[#fd2879] to-[#ff8941]" onClick={(e) =>createNewItem()}>Create</button>
               }
                 </>
               }

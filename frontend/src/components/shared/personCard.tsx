@@ -19,22 +19,11 @@ const CardHeader =(props: CardHeaderType) => {
         <header style={{}} id={props.image} className="card-header">
              <div className="">
                  <h4 className="absolute font-normal text-xl text-gray-300 opacity-90 pl-2 pt-2 z-1">Founder</h4>
-                <img className="rounded-xl"src={props.image}>
-                    
-                </img>
-               
+                  <img className="rounded-xl"src={props.image} />
              </div>
         </header>
       )
     }
-  
- const Button = () => {    
-      return (
-        <button className="button button-primary">
-          <i className="fa fa-chevron-right"></i> Find out more
-        </button>
-      )   
-  }
 
   const CardBody = (props: CardBodyType) => {
       return (
