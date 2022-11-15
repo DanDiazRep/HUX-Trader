@@ -55,7 +55,8 @@ export const CreateItemForm = ({addItemToUser, setNotAddingProduct}: Props) =>{
     
 
     return (
-        <div className="flex-row w-[350px] h-[550px] m-4 justify-center justify-self-center self-center justify-items-center rounded-lg shadow-xl bg-[#FFF]">
+      <>
+        <div className="flex-row w-[350px] h-[550px] m-4 justify-center rounded-lg shadow-sm bg-[#FFF] create-item">
             <div className="h-full">
                 <label htmlFor="file-upload" className="flex h-full custom-file-upload cursor-pointer justify-center">
                     {!!imageUrl ? <>
@@ -64,7 +65,7 @@ export const CreateItemForm = ({addItemToUser, setNotAddingProduct}: Props) =>{
                     </div></>:
                     <div className="flex flex-col items-center self-center">
                       <AiOutlinePlusCircle size= {100}/>
-                      <p className="text-white font-semibold mt-4 py-2 px-5 rounded-xl bg-gradient-to-tr from-[#fd2879] to-[#ff8941]">Upload a picture</p>
+                      <p className="text-white font-semibold mt-4 py-2 px-5 rounded-md bg-gradient-to-tr from-[#fd2879] to-[#ff8941]">Upload a picture</p>
                     </div>
                 }
                 </label>
@@ -110,12 +111,13 @@ export const CreateItemForm = ({addItemToUser, setNotAddingProduct}: Props) =>{
                 </div>
               </>
             }
-            <div className="flex w-full justify-center gap-5">
-              { !!description && !!name &&
-                <button type="button" className="flex content-center relative bottom-[70px] text-white py-2 px-4 font-semibold rounded-md bg-gradient-to-tr from-[#fd2879] to-[#ff8941]" onClick={(e) => createNewItem()}>Create</button>
-              }
-                <button type="button" className="flex content-center relative bottom-[70px] py-2 px-4 font-semibold rounded-md bg-gray-300 text-black" onClick={(e) => setNotAddingProduct(true)}>Cancel</button>
-            </div>
         </div> 
+        <div className="absolute bottom-10 flex w-full justify-center gap-5">
+          { !!description && !!name &&
+            <button type="button" className="text-white py-2 px-4 font-semibold rounded-md bg-gradient-to-tr from-[#fd2879] to-[#ff8941]" onClick={(e) => createNewItem()}>Create</button>
+          }
+            <button type="button" className="py-2 px-4 font-semibold rounded-md bg-gray-300 text-black" onClick={(e) => setNotAddingProduct(true)}>Cancel</button>
+        </div>
+      </>
     );
   }

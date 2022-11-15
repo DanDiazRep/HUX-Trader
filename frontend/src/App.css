@@ -2,6 +2,10 @@ body{
     overflow-x: hidden;
 }
 
+.create-item{
+    margin-top: -3.5%;
+}
+
 .swipeable{
     left: 50%;
     top: 50%;

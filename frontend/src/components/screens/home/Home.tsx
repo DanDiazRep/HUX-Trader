@@ -115,9 +115,7 @@ export const Home = () =>{
         {isLoadingUser ? <p>Loading...</p>:
           !!userData && isNotAddingProduct ?
           <SwipingMenu /> :
-          <div className="flex flex-col w-fit items-center">
-            <CreateItemForm addItemToUser={addItemToUser} setNotAddingProduct={setNotAddingProduct}/>
-          </div>
+          <CreateItemForm addItemToUser={addItemToUser} setNotAddingProduct={setNotAddingProduct}/>
         }
       </div>
     </div>
