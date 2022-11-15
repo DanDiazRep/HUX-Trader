@@ -6,6 +6,7 @@ import {AiOutlinePlusCircle} from 'react-icons/ai';
 import { ItemType } from "./Home";
 
 interface Props {
+  setNotAddingProduct: (toggle: boolean) => void,
   addItemToUser: (item: ItemType) => void
 }
 
@@ -16,7 +17,7 @@ export type CreateItemType = {
     description: string,
 }
 
-export const CreateItemForm = ({addItemToUser}: Props) =>{
+export const CreateItemForm = ({addItemToUser, setNotAddingProduct}: Props) =>{
     const [name, setName] = React.useState<string>("");
     const [description, setDescription] = React.useState<string>("");
     const [imageData, setImage] = React.useState<File>();
@@ -41,9 +42,7 @@ export const CreateItemForm = ({addItemToUser}: Props) =>{
         {
           onSuccess: (res) => {
             if (res) {
-              console.log(res)
               if(res.data){
-                console.log("post result", res.data);
                 addItemToUser(res.data as ItemType)
               }
             }
@@ -57,16 +56,15 @@ export const CreateItemForm = ({addItemToUser}: Props) =>{
 
     return (
         <div className="flex-row w-[350px] h-[550px] m-4 justify-center justify-self-center self-center justify-items-center rounded-lg shadow-xl bg-[#FFF]">
-            <form>
-            <div>
-                <label htmlFor="file-upload" className="flex custom-file-upload cursor-pointer justify-center">
+            <div className="h-full">
+                <label htmlFor="file-upload" className="flex h-full custom-file-upload cursor-pointer justify-center">
                     {!!imageUrl ? <>
-                    <div className="w-[400px] rounded object-cover z-1 h-[450px] bg-gradient-to-b from-[#c4c4c4] to-black">
-                      <img className="w-[400px] rounded object-cover z-0 h-[450px] opacity-80" src={imageUrl} alt="product"/>
+                    <div className="w-[400px] rounded object-cover z-1 h-[550px] bg-black">
+                      <img className="w-[400px] rounded object-cover z-0 h-[550px] opacity-80" src={imageUrl} alt="product"/>
                     </div></>:
-                    <div className="relative top-24 text-center self-center">
-                      <AiOutlinePlusCircle size= {160}/>
-                      <p className="text-white font-semibold rounded-xl bg-gradient-to-tr from-[#fd2879] to-[#ff8941]">Upload a picture</p>
+                    <div className="flex flex-col items-center self-center">
+                      <AiOutlinePlusCircle size= {100}/>
+                      <p className="text-white font-semibold mt-4 py-2 px-5 rounded-xl bg-gradient-to-tr from-[#fd2879] to-[#ff8941]">Upload a picture</p>
                     </div>
                 }
                 </label>
@@ -80,41 +78,44 @@ export const CreateItemForm = ({addItemToUser}: Props) =>{
                     }
                 } />
             </div>  
-            {!!imageUrl && <>
-            <div className="block relative bottom-[100px] px-4">
-                <input 
-                  type="text" 
-                  name="floating_name" 
-                  id="floating_name" 
-                  className="py-2.5 px-0 w-full text-2xl font-bold placeholder-white placeholder-text-xl text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-[#fd2879] dark:focus:border-[#ff8941] focus:outline-none focus:ring-0 focus:border-[#fd2879] peer" 
-                  placeholder="Name" required 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}/>
-                <label 
-                  htmlFor="floating_name" 
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-[#fd2879] peer-focus:dark:text-[#fd2879] peer-placeholder-shown:scale-100  peer-focus:scale-75 ">
-                    Name
-                </label>
-                <input 
-                  type="text" 
-                  name="floating_description" 
-                  id="floating_description" 
-                  className="py-2.5 px-0 w-full text-ms font-bold placeholder-white placeholder-text-xl text-gray-900 bg-transparent border-b-2 border-gray-300 appearance-none dark:text-white dark:border-[#fd2879] dark:focus:border-[#ff8941] focus:outline-none focus:ring-0 focus:border-[#fd2879] peer" 
-                  placeholder="Description" required 
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}/>
-                <label 
-                  htmlFor="floating_description" 
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-[#fd2879] peer-focus:dark:text-[#fd2879] peer-placeholder-shown:scale-100 peer-focus:scale-75 ">
-                    Description
-                </label>
-              </div>
+            {!!imageUrl && 
+            <>
+              <div className="block relative bottom-[120px] px-4">
+                  <input 
+                    type="text" 
+                    name="floating_name" 
+                    id="floating_name" 
+                    className="py-2.5 px-0 w-full text-2xl font-bold placeholder-white placeholder-text-xl text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-[#fd2879] dark:focus:border-[#ff8941] focus:outline-none focus:ring-0 focus:border-[#fd2879] peer" 
+                    placeholder="Name" required 
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}/>
+                  <label 
+                    htmlFor="floating_name" 
+                    className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-[#fd2879] peer-focus:dark:text-[#fd2879] peer-placeholder-shown:scale-100  peer-focus:scale-75 ">
+                      Name
+                  </label>
+                  <input 
+                    type="text" 
+                    name="floating_description" 
+                    id="floating_description" 
+                    className="py-2.5 px-0 w-full text-ms font-bold placeholder-white placeholder-text-xl text-gray-900 bg-transparent border-b-2 border-gray-300 appearance-none dark:text-white dark:border-[#fd2879] dark:focus:border-[#ff8941] focus:outline-none focus:ring-0 focus:border-[#fd2879] peer" 
+                    placeholder="Description" required 
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}/>
+                  <label 
+                    htmlFor="floating_description" 
+                    className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-[#fd2879] peer-focus:dark:text-[#fd2879] peer-placeholder-shown:scale-100 peer-focus:scale-75 ">
+                      Description
+                  </label>
+                </div>
+              </>
+            }
+            <div className="flex w-full justify-center gap-5">
               { !!description && !!name &&
-                <button type="button" className="flex content-center relative bottom-[54px] mx-32 text-white py-2 px-4 font-semibold rounded-2xl bg-gradient-to-tr from-[#fd2879] to-[#ff8941]" onClick={(e) =>createNewItem()}>Create</button>
+                <button type="button" className="flex content-center relative bottom-[70px] text-white py-2 px-4 font-semibold rounded-md bg-gradient-to-tr from-[#fd2879] to-[#ff8941]" onClick={(e) => createNewItem()}>Create</button>
               }
-                </>
-              }
-            </form>
+                <button type="button" className="flex content-center relative bottom-[70px] py-2 px-4 font-semibold rounded-md bg-gray-300 text-black" onClick={(e) => setNotAddingProduct(true)}>Cancel</button>
+            </div>
         </div> 
     );
   }
