@@ -15,7 +15,7 @@ type ItemCard = {
 
 export const ItemsList = ({items, selectedItem, setSelectedItem}: ItemsListType) =>{
     return (
-        <div className="overflow-auto p-3 flex-1">
+        <div className="overflow-auto px-4 flex-1">
             {items?.length > 0 ? 
                 items.map(item => 
                     <Item key={item.id} item={item} selectedItem={selectedItem} setSelectedItem={setSelectedItem}/>
@@ -28,14 +28,17 @@ export const ItemsList = ({items, selectedItem, setSelectedItem}: ItemsListType)
 
   export const Item = ({item, selectedItem, setSelectedItem}: ItemCard) => {
     return (
-         <div className={`flex flex-row p-4 px-4 mb-4 shadow rounded-md ${item.id === selectedItem ? 'border-b border-[#fd2879]' : 'border-b border-transparent'}`}
+         <div className={`flex flex-row p-4 px-4 mb-4 shadow cursor-pointer rounded-md ${item.id === selectedItem ? 'border-b border-[#fd2879]' : 'border-b border-transparent'}`}
             onClick={() => setSelectedItem(item.id)}>
-            <div className="flex flex-row w-fill cursor-pointer">
+            <div className="flex flex-row w-fill">
                 <img className="h-[90px] w-[120px] object-cover rounded-md" src={item.url} alt="item"/>
                 <p className="flex ml-4 self-center font-semibold text-black">{item.name}</p>   
             </div> 
-            <div className="flex ml-2 rounded-2xl w-7 h-7 self-center justify-center hover:bg-[#616161] hover:invert cursor-pointer">
-                <AiOutlineEdit className="self-center font-semibold text-black "/>   
+            <div className="flex ml-2 rounded-2xl w-7 h-7 self-center justify-center hover:bg-[#616161] hover:invert cursor-pointer"
+                onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation()
+                }}>
+                <AiOutlineEdit className="self-center font-semibold text-black"/>   
             </div>     
         </div>
     );

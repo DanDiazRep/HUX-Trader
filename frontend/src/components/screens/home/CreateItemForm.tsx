@@ -61,7 +61,7 @@ export const CreateItemForm = ({addItemToUser}: Props) =>{
                 <label htmlFor="file-upload" className="flex custom-file-upload cursor-pointer justify-center">
                     {!!imageUrl ? <>
                     <div className="w-[400px] rounded object-cover z-1 h-[450px] bg-gradient-to-b from-[#c4c4c4] to-black">
-                    <img className="w-[400px] rounded object-cover z-0 h-[450px] opacity-80" src={imageUrl} alt="product"/>
+                      <img className="w-[400px] rounded object-cover z-0 h-[450px] opacity-80" src={imageUrl} alt="product"/>
                     </div></>:
                     <div className="relative top-24 text-center self-center">
                       <AiOutlinePlusCircle size= {160}/>

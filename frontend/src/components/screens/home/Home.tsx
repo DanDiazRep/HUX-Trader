@@ -3,7 +3,6 @@ import React from "react";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { ImExit } from "react-icons/im";
 import { useQuery } from "react-query";
-import { Link } from "react-router-dom";
 import apiClient from "../../shared/htttp-common";
 import { CreateItemForm} from "./CreateItemForm";
 import { ItemsList } from "./ItemsList";
@@ -51,6 +50,14 @@ export const Home = () =>{
       },
       onError: (err) => {
         console.log("ERROR",err);
+        if(user && user.sub && user.email){
+          setUserData({
+            id: '',
+            userId: user.sub,
+            email: user.email,
+            items: []
+          })
+        }
       },
     }
   );
@@ -104,7 +111,7 @@ export const Home = () =>{
       </div>
 
       <div className="col-span-4 row-span-full bg-[#f0f2f4] flex items-center justify-center">
-        <div className="flex flex-row p-8 h-max justify-center">
+        <div className="flex flex-row p-8 h-max justify-center relative">
             {isLoadingUser ? <p>Loading...</p>:
               !!userData && isNotAddingProduct ?
               <SwipingMenu /> :

@@ -85,6 +85,34 @@ app.patch('/item', async (req, res) => {
     }
 })
 
+app.get('/items/:id', async (req, res) => {
+    let id = req.params.id
+    try {
+        const database = client.db('trader');
+        const users = database.collection('users');
+        const result = users.aggregate([
+            {
+              '$match': {
+                'userId': {
+                  '$ne': id
+                }
+              }
+            }, {
+              '$sample': {
+                'size': 2
+              }
+            }
+          ])
+        let items = []
+        for await (const doc of result) {
+            items.push({id: doc._id, userId: doc.userId, email: doc.email, items: [doc.items[Math.floor(Math.random() * doc.items.length)]]});
+        }
+        res.send(items)
+    } catch (e) {
+        return e
+    }
+})
+
 app.get('/user/:id', async (req, res) => {
     let id = req.params.id
     let user = await getUser(id)
