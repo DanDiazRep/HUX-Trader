@@ -52,15 +52,13 @@ app.post('/item', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image'),
         .then(async function(response) {
             let url = response.data.image.image.url
             let id = uuidv4()
-            const result = await addItemToUser(req.body.id, req.body.email, id, url, req.body.name, req.body.description)
-            if(result.acknowledged && result.modifiedCount){
-                res.send({
-                    id,
-                    url,
-                    name: req.body.name,
-                    description: req.body.description
-                })
-            }
+            await addItemToUser(req.body.id, req.body.email, id, url, req.body.name, req.body.description)
+            res.send({
+                id,
+                url,
+                name: req.body.name,
+                description: req.body.description
+            })
         })
         .catch(function(error) {
             res.send(500)

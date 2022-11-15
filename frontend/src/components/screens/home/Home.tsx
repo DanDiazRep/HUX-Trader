@@ -42,6 +42,7 @@ export const Home = () =>{
       retry: 1,
       onSuccess: (res) => {
         if (res) {
+          console.log(res)
           setUserData(res.data);
           if(res.data.items?.length > 0){
             setSelectedItem(res.data.items[0].id)

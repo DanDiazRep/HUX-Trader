@@ -41,6 +41,7 @@ export const CreateItemForm = ({addItemToUser}: Props) =>{
         {
           onSuccess: (res) => {
             if (res) {
+              console.log(res)
               if(res.data){
                 console.log("post result", res.data);
                 addItemToUser(res.data as ItemType)
