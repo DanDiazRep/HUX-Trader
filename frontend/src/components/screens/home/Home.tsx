@@ -58,6 +58,7 @@ export const Home = () =>{
  const addItemToUser = (item: ItemType) => {
   if(userData){
     const newObj = {...userData}
+    if(!newObj.items) newObj.items = []
     newObj.items = [...newObj.items, item]
     setUserData(newObj)
     setNotAddingProduct(true)
@@ -75,11 +76,11 @@ export const Home = () =>{
                 onClick={() => logout({ returnTo: window.location.origin })}/>   
           </div>     
         </div>
-        <div className="flex flex-row p-2 mx-4">
-        <button className={`font-semibold px-4 ${isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
-                onClick={() => setProductsActive(true)}>Products</button>
-        <button className={`font-semibold px-4 ${!isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
-                onClick={() => setProductsActive(false)}>Trades</button>
+        <div className="flex flex-row py-2 pb-3 mx-4">
+          <button className={`font-semibold mr-4 ${isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
+                  onClick={() => setProductsActive(true)}>Products</button>
+          <button className={`font-semibold ml-4 ${!isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
+                  onClick={() => setProductsActive(false)}>Trades</button>
         </div>
         
         {isProductsActive ? 
@@ -93,7 +94,7 @@ export const Home = () =>{
                 </button>
               </>
             : 
-              <p>No items available</p> : <p>Trades...</p>
+              <p>No items available</p> : <p className="px-4">Coming soon...</p>
         }
       </div>
 
