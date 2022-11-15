@@ -111,15 +111,13 @@ export const Home = () =>{
       </div>
 
       <div className="col-span-4 row-span-full bg-[#f0f2f4] flex items-center justify-center">
-        <div className="flex flex-row p-8 h-max justify-center relative">
-            {isLoadingUser ? <p>Loading...</p>:
-              !!userData && isNotAddingProduct ?
-              <SwipingMenu /> :
-              <div className="flex flex-col w-fit items-center">
-                <CreateItemForm addItemToUser={addItemToUser}/>
-              </div>
-            }
+        {isLoadingUser ? <p>Loading...</p>:
+          !!userData && isNotAddingProduct ?
+          <SwipingMenu /> :
+          <div className="flex flex-col w-fit items-center">
+            <CreateItemForm addItemToUser={addItemToUser}/>
           </div>
+        }
       </div>
     </div>
   );
