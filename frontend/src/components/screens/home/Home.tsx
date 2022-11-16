@@ -80,14 +80,6 @@ export const Home = () =>{
   }
  }
 
- const editUserItem = (item: ItemType) => {
-  if(userData){
-    const newObj = {...userData}
-    setUserData(newObj)
-    setNotEditingProduct(true)
-  }
- }
-
   return ( 
     <div className="grid grid-cols-5 flex-1 max-h-screen">
       <div className="col-span-1 row-span-full overflow-hidden flex flex-col">
@@ -128,7 +120,7 @@ export const Home = () =>{
             !isNotAddingProduct  && isNotEditingProduct? 
             <CreateItemForm addItemToUser={addItemToUser} setNotAddingProduct={setNotAddingProduct}/> :
               !!userData && !isNotEditingProduct && !!selectedItem ?
-                <EditItemForm editUserItem={editUserItem} setNotEditingProduct={setNotEditingProduct} editedItem={userData?.items.find(item => item.id === selectedItem)!}/> :
+                <EditItemForm setNotEditingProduct={setNotEditingProduct} editedItem={userData?.items.find(item => item.id === selectedItem)!}/> :
                   <CreateItemForm addItemToUser={addItemToUser} setNotAddingProduct={setNotAddingProduct}/>
         }
       </div>

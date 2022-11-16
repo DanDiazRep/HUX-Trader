@@ -68,14 +68,14 @@ app.post('/item', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image'),
     }
 })
 
-app.patch('/item', async (req, res) => {
+app.patch('/item', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image'), async (req, res) => {
     let id = req.body.id
     let itemId = req.body.itemId
     let itemName = req.body.itemName
     let itemDescription = req.body.itemDescription
-    console.log(req.body)
+
     let result = await editItem(id, itemId, itemName, itemDescription)
-    console.log(result)
+
     if(result.acknowledged && result.matchedCount){
         res.sendStatus(200)
     } else{

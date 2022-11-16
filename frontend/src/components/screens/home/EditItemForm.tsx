@@ -7,7 +7,6 @@ import { ItemType } from "./Home";
 interface Props {
   editedItem: ItemType,
   setNotEditingProduct: (toggle: boolean) => void,
-  editUserItem: (item: ItemType) => void
 }
 
 export type CreateItemType = {
@@ -17,7 +16,7 @@ export type CreateItemType = {
     description: string,
 }
 
-export const EditItemForm = ({editUserItem, setNotEditingProduct, editedItem}: Props) =>{
+export const EditItemForm = ({setNotEditingProduct, editedItem}: Props) =>{
     const [name, setName] = React.useState<string>(editedItem.name);
     const [description, setDescription] = React.useState<string>(editedItem.description);
 
@@ -27,20 +26,20 @@ export const EditItemForm = ({editUserItem, setNotEditingProduct, editedItem}: P
         "query_edit_item",
         async () => {
           if(!!user?.sub && !!name && !!description){
-            let data = {id: user.sub, itemId: editedItem.id, itemName: name, itemDescription: description}
+            let data = new FormData()
+            data.append("id", user.sub);
+            data.append("itemId", editedItem.id);
+            data.append("itemName", name);
+            data.append("itemDescription", description);
 
             return await apiClient.patch(`/item`, data);
           }
         },
         {
           onSuccess: (res) => {
-            if (res) {
-              if(res.data){
-                editedItem.description = description;
-                editedItem.name = name;
-                editUserItem(res.data as ItemType)
-              }
-            }
+              editedItem.description = description;
+              editedItem.name = name;
+              setNotEditingProduct(true)
           },
           onError: (err) => {
             console.log("ERROR",err);
