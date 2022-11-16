@@ -1,5 +1,5 @@
 import { useAuth0, User } from "@auth0/auth0-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useQuery } from "react-query";
 import apiClient from "../../shared/htttp-common";
 import { ItemType } from "./Home";
@@ -47,6 +47,10 @@ export const EditItemForm = ({setNotEditingProduct, editedItem}: Props) =>{
         }
       );      
     
+      useEffect(() => {
+        setName(editedItem.name);
+        setDescription(editedItem.description);
+      }, [editedItem]); 
 
     return (
       <>
