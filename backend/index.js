@@ -23,7 +23,7 @@ var corsOptions = {
       callback(null, false);
     }
   },
-  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],
   optionsSuccessStatus: 200,
   credentials: false,
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'device-remember-token', 'Access-Control-Allow-Origin', 'Origin', 'Accept']
@@ -70,12 +70,12 @@ app.post('/item', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image'),
 
 app.patch('/item', async (req, res) => {
     let id = req.body.id
-    let itemId = req.body.item.id
-    let itemName = req.body.item.name
-    let itemDescription = req.body.item.description
-
+    let itemId = req.body.itemId
+    let itemName = req.body.itemName
+    let itemDescription = req.body.itemDescription
+    console.log(req.body)
     let result = await editItem(id, itemId, itemName, itemDescription)
-
+    console.log(result)
     if(result.acknowledged && result.matchedCount){
         res.sendStatus(200)
     } else{

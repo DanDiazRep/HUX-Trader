@@ -5,6 +5,7 @@ import { ImExit } from "react-icons/im";
 import { useQuery } from "react-query";
 import apiClient from "../../shared/htttp-common";
 import { CreateItemForm} from "./CreateItemForm";
+import { EditItemForm} from "./EditItemForm";
 import { ItemsList } from "./ItemsList";
 import { SwipingMenu } from "./SwipeMenu";
 // This will be the main logged in / swiping screen
@@ -29,6 +30,7 @@ export const Home = () =>{
   const [selectedItem, setSelectedItem] = React.useState<string>("");
   const [isProductsActive, setProductsActive] = React.useState<boolean>(true);
   const [isNotAddingProduct, setNotAddingProduct] = React.useState<boolean>(true);
+  const [isNotEditingProduct, setNotEditingProduct] = React.useState<boolean>(true);
   
   const { isLoading: isLoadingUser, refetch: getUserById } = useQuery(
     "query_user_by_id",
@@ -78,6 +80,14 @@ export const Home = () =>{
   }
  }
 
+ const editUserItem = (item: ItemType) => {
+  if(userData){
+    const newObj = {...userData}
+    setUserData(newObj)
+    setNotEditingProduct(true)
+  }
+ }
+
   return ( 
     <div className="grid grid-cols-5 flex-1 max-h-screen">
       <div className="col-span-1 row-span-full overflow-hidden flex flex-col">
@@ -101,7 +111,7 @@ export const Home = () =>{
               <p>Loading...</p>:
             !!userData ?
               <>
-                <ItemsList items={userData.items} selectedItem={selectedItem} setSelectedItem={(id: string) => setSelectedItem(id)}/> 
+                <ItemsList items={userData.items} selectedItem={selectedItem} setSelectedItem={(id: string) => setSelectedItem(id)} setNotEditingProduct={setNotEditingProduct}/> 
                 <button onClick={()=> setNotAddingProduct(false)}className="flex w-full justify-center p-4 px-4 shadow bg-gradient-to-r from-sky-500 to-indigo-500">
                   <AiOutlinePlusCircle className="text-white" size= {40}/>
                 </button>
@@ -113,9 +123,13 @@ export const Home = () =>{
 
       <div className="col-span-4 row-span-full bg-[#f0f2f4] flex items-center justify-center">
         {isLoadingUser ? <p>Loading...</p>:
-          !!userData && isNotAddingProduct ?
+          !!userData && isNotAddingProduct && isNotEditingProduct ?
           <SwipingMenu /> :
-          <CreateItemForm addItemToUser={addItemToUser} setNotAddingProduct={setNotAddingProduct}/>
+            !isNotAddingProduct  && isNotEditingProduct? 
+            <CreateItemForm addItemToUser={addItemToUser} setNotAddingProduct={setNotAddingProduct}/> :
+              !!userData && !isNotEditingProduct && !!selectedItem ?
+                <EditItemForm editUserItem={editUserItem} setNotEditingProduct={setNotEditingProduct} editedItem={userData?.items.find(item => item.id === selectedItem)!}/> :
+                  <CreateItemForm addItemToUser={addItemToUser} setNotAddingProduct={setNotAddingProduct}/>
         }
       </div>
     </div>

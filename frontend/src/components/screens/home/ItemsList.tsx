@@ -4,21 +4,23 @@ import { AiOutlineEdit } from 'react-icons/ai'
 export type ItemsListType = {
     items: ItemType[],
     selectedItem: string,
-    setSelectedItem: (id: string) => void
+    setSelectedItem: (id: string) => void,
+    setNotEditingProduct: (toggle: boolean) => void
 };
 
 type ItemCard = {
     item: ItemType,
     selectedItem: string,
-    setSelectedItem: (id: string) => void
+    setSelectedItem: (id: string) => void,
+    setNotEditingProduct: (toggle: boolean) => void
 }
 
-export const ItemsList = ({items, selectedItem, setSelectedItem}: ItemsListType) =>{
+export const ItemsList = ({items, selectedItem, setSelectedItem, setNotEditingProduct}: ItemsListType) =>{
     return (
         <div className="overflow-auto px-4 flex-1">
             {items?.length > 0 ? 
                 items.map(item => 
-                    <Item key={item.id} item={item} selectedItem={selectedItem} setSelectedItem={setSelectedItem}/>
+                    <Item key={item.id} item={item} selectedItem={selectedItem} setSelectedItem={setSelectedItem} setNotEditingProduct={setNotEditingProduct}/>
                 ) :
                 <p>You don't have any items yet. Start by clicking the button below!</p>
             }
@@ -26,7 +28,7 @@ export const ItemsList = ({items, selectedItem, setSelectedItem}: ItemsListType)
     );
   }
 
-  export const Item = ({item, selectedItem, setSelectedItem}: ItemCard) => {
+  export const Item = ({item, selectedItem, setSelectedItem, setNotEditingProduct}: ItemCard) => {
     return (
          <div className={`flex flex-row justify-between p-4 px-4 mb-4 shadow cursor-pointer rounded-md ${item.id === selectedItem ? 'border-b border-[#fd2879]' : 'border-b border-transparent'}`}
             onClick={() => setSelectedItem(item.id)}>
@@ -37,6 +39,8 @@ export const ItemsList = ({items, selectedItem, setSelectedItem}: ItemsListType)
             <div className="flex ml-2 rounded-full p-2 self-center justify-center hover:bg-[#616161] hover:invert cursor-pointer"
                 onClick={(e: React.MouseEvent) => {
                     e.stopPropagation()
+                    setSelectedItem(item.id)
+                    setNotEditingProduct(false)
                 }}>
                 <AiOutlineEdit className="self-center font-semibold text-black text-md"/>   
             </div>     
