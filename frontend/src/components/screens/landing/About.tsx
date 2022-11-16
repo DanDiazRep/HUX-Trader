@@ -1,4 +1,4 @@
-import PersonCard from "../../shared/personCard";
+import PersonCard from "./personCard";
 
 // This is the home screen for non logged in users
 export const About = () =>{

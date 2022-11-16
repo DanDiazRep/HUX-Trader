@@ -1,8 +1,7 @@
 import { useAuth0, User } from "@auth0/auth0-react";
-import React, { useEffect } from "react";
-import { useQuery } from "react-query";
+import React, { useContext, useEffect } from "react";
 import apiClient from "../../shared/htttp-common";
-import { ItemType } from "./Home";
+import { ItemType, UserContext } from "./Home";
 
 interface Props {
   editedItem: ItemType,
@@ -18,13 +17,11 @@ export type CreateItemType = {
 
 export const EditItemForm = ({setNotEditingProduct, editedItem}: Props) =>{
     const [name, setName] = React.useState<string>(editedItem.name);
-    const [description, setDescription] = React.useState<string>(editedItem.description);
+    const [description, setDescription] = React.useState<string>(editedItem.description); 
+    const { user } = useAuth0();
+    const {refetch: getUserById} = useContext(UserContext);
 
-    const { user, isAuthenticated } = useAuth0();
-
-    const { isLoading: isPosting, refetch: editItem } = useQuery(
-        "query_edit_item",
-        async () => {
+    const editItem = async () => {
           if(!!user?.sub && !!name && !!description){
             let data = new FormData()
             data.append("id", user.sub);
@@ -32,20 +29,40 @@ export const EditItemForm = ({setNotEditingProduct, editedItem}: Props) =>{
             data.append("itemName", name);
             data.append("itemDescription", description);
 
-            return await apiClient.patch(`/item`, data);
-          }
-        },
-        {
-          onSuccess: (res) => {
+            return await apiClient.patch(`/item`, data)
+            .then((res) => {
               editedItem.description = description;
               editedItem.name = name;
               setNotEditingProduct(true)
-          },
-          onError: (err) => {
+          })
+          .catch((err) => {
             console.log("ERROR",err);
-          },
-        }
-      );      
+          })
+          }
+        };    
+
+      const deleteItem = async () => {
+          if(!!user?.sub && !!editedItem.id){
+            let data = new FormData()
+            data.append("userId", user.sub);  
+            data.append("itemId", editedItem.id);           
+
+            return await apiClient.patch(`/delete`, data)            
+            .then((res) => {        
+              console.log("item deleted");            
+              setNotEditingProduct(true);
+              if (getUserById) 
+              getUserById();
+          })
+          .catch((err) => {
+            
+            console.log("ERROR DELETING ITEM",err);
+            if (getUserById) 
+              getUserById();
+          })
+          }        
+      };      
+    
     
       useEffect(() => {
         setName(editedItem.name);
@@ -99,10 +116,21 @@ export const EditItemForm = ({setNotEditingProduct, editedItem}: Props) =>{
         </div> 
         <div className="absolute bottom-10 flex w-full justify-center gap-5">
           { !!description && !!name &&
-            <button type="button" className="text-white py-2 px-4 font-semibold rounded-md bg-gradient-to-tr from-[#fd2879] to-[#ff8941]" onClick={(e) => editItem()}>Edit</button>
+            <button type="button" 
+            className="text-white py-2 px-4 font-semibold rounded-md bg-gradient-to-tr from-[#fd2879] to-[#ff8941]" 
+            onClick={(e) => editItem()}>Edit</button>
           }
-            <button type="button" className="py-2 px-4 font-semibold rounded-md bg-gray-300 text-black" onClick={(e) => setNotEditingProduct(true)}>Cancel</button>
+            <button type="button" 
+            className="py-2 px-4 font-semibold rounded-md bg-gray-300 text-black" 
+            onClick={(e) => setNotEditingProduct(true)}>Cancel</button>
         </div>
+        <button type="button" 
+        className="absolute bottom-0 right-0 m-10 py-2 px-4 font-semibold rounded-md bg-red-600 text-white" 
+        onClick={(e) => {
+          deleteItem(); 
+          setNotEditingProduct(true);          
+            }
+          }>Delete</button>
       </>
     );
   }

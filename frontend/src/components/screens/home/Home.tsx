@@ -1,8 +1,9 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import React from "react";
+import { AxiosResponse } from "axios";
+import React, { createContext } from "react";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { ImExit } from "react-icons/im";
-import { useQuery } from "react-query";
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useQuery } from "react-query";
 import apiClient from "../../shared/htttp-common";
 import { CreateItemForm} from "./CreateItemForm";
 import { EditItemForm} from "./EditItemForm";
@@ -24,6 +25,15 @@ export type ItemType = {
   description: string,
 };
 
+export type UserContextType = {
+refetch: undefined | (<TPageData>(options?: 
+  (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined) => 
+    Promise<QueryObserverResult<AxiosResponse<any, any> | undefined, unknown>>),    
+
+};
+
+export const UserContext = createContext<UserContextType>({refetch: undefined});
+
 export const Home = () =>{
   const { user, logout } = useAuth0();
   const [userData, setUserData] = React.useState<UserItemsType>();
@@ -32,7 +42,7 @@ export const Home = () =>{
   const [isNotAddingProduct, setNotAddingProduct] = React.useState<boolean>(true);
   const [isNotEditingProduct, setNotEditingProduct] = React.useState<boolean>(true);
   
-  const { isLoading: isLoadingUser, refetch: getUserById } = useQuery(
+  const { isLoading: isLoadingUser, refetch: getUserById} = useQuery(
     "query_user_by_id",
     async () => {
       if(user){
@@ -81,6 +91,7 @@ export const Home = () =>{
  }
 
   return ( 
+    <UserContext.Provider value={{refetch: getUserById}}>
     <div className="grid grid-cols-5 flex-1 max-h-screen">
       <div className="col-span-1 row-span-full overflow-hidden flex flex-col">
         <div className="flex flex-row items-center justify-between p-4 px-4 bg-gradient-to-tr from-[#fd2879] to-[#ff8941]">      
@@ -125,5 +136,6 @@ export const Home = () =>{
         }
       </div>
     </div>
+    </UserContext.Provider>
   );
 }

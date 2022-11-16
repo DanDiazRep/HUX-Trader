@@ -83,6 +83,31 @@ app.patch('/item', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image')
     }
 })
 
+app.patch('/delete', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image'), async (req, res) => {
+    const database = client.db('trader');
+    const users = database.collection('users');
+
+    let userId = req.body.userId;
+    let itemId = req.body.itemId;
+
+    const result = users.updateOne(
+        {
+            userId: userId,
+            "items.id": itemId
+        }, 
+        {
+            $pull: { "items" : { "id" :  itemId } } 
+
+        });
+
+    if(result){
+        res.sendStatus(200)
+    } else{
+        res.sendStatus(500)
+    }
+    
+})
+
 app.get('/items/:id/:currentItemId?/:lastItemId?', async (req, res) => {
     let id = req.params.id
     try {
