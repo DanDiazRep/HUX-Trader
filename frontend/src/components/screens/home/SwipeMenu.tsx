@@ -6,15 +6,24 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { UserItemsType } from './Home';
 import { IoMdClose, IoMdHeart } from "react-icons/io";
 
-export const SwipingMenu = () => {
+interface Props{
+    selectedItem: string
+}
+
+export const SwipingMenu = (props: Props) => {
     const { user } = useAuth0();
     const [items, setItems] = React.useState<UserItemsType[]>([])
+    const [lastSwiped, setLastSwiped] = React.useState<string>("")
 
     const { isLoading: isLoadingItems, refetch: getRandomItems } = useQuery(
         "query_random_items",
         async () => {
             if(user && user.sub){
-                return await apiClient.get(`/items/${user.sub}`);
+                if(items.length > 0){
+                    return await apiClient.get(`/items/${user.sub}/${items.slice(-1)[0].items[0].id}/${lastSwiped}`);
+                } else if(items.length === 0 && lastSwiped === ""){
+                    return await apiClient.get(`/items/${user.sub}`);
+                }
             }
         },
         {
@@ -36,15 +45,34 @@ export const SwipingMenu = () => {
     );
     
     React.useEffect(() => {
-        if(items.length < 2){
+        if(items.length <= 1){
             getRandomItems()
         }
     }, [getRandomItems, items.length])
 
-    const swiped = (direction: string, idToDelete: string) => {
-        if(idToDelete.split('|')[0] === items.slice(-1)[0].items[0].id){
-            const filteredArray = items.filter((item, index) => index !== items.length - 1);
+    const swiped = (direction: string, itemId: string, userId: string) => {
+        if(itemId.split('|')[0] === items.slice(-1)[0].items[0].id){
+            setLastSwiped(itemId)
+            const lastRemoved = items.filter((item, index) => index !== items.length - 1);
+            const filteredArray = lastRemoved.filter((item) => item.id !== itemId)
             setItems(filteredArray)
+
+            fetch('http://localhost:3030/swipe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userA: user!.sub,
+                    itemA: props.selectedItem,
+                    userB: userId,
+                    itemB: itemId,
+                    direction
+                }),
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+            });
         }
     }
 
@@ -54,7 +82,7 @@ export const SwipingMenu = () => {
                 {items.length > 0 && items.map((record) =>
                     <div key={record.items[0].id + '|' + Math.random() + Math.random()} className='absolute swipeable select-none'>
                         <TinderCard className='swipe' 
-                            onSwipe={(dir) => swiped(dir, record.items[0].id)}
+                            onSwipe={(dir) => swiped(dir, record.items[0].id, record.userId)}
                             preventSwipe={["up", "down"]}>
                             <div className="flex-row cursor-pointer w-[350px] h-[550px] m-4 rounded-lg shadow-sm bg-[#FFF]">
                                 <div className="overflow-hidden relative h-full">
@@ -71,17 +99,24 @@ export const SwipingMenu = () => {
                         </TinderCard>
                     </div>
                 )}
+                {
+                    items.length === 0 &&
+                    <p>We don't have any more items for you right now.</p>
+                }
             </div>
-            <div className='absolute bottom-10 flex items-center gap-5'>
-                <div className='bg-white p-3 rounded-full cursor-pointer hover:bg-red-50 select-none'
-                    onClick={() => swiped('left', items.slice(-1)[0].items[0].id)}>
-                    <IoMdClose className="self-center font-semibold text-red-600 text-3xl"/>
+            {
+                items.length > 0 && 
+                <div className='absolute bottom-10 flex items-center gap-5'>
+                    <div className='bg-white p-3 rounded-full cursor-pointer hover:bg-red-50 select-none'
+                        onClick={() => swiped('left', items.slice(-1)[0].items[0].id, items.slice(-1)[0].userId)}>
+                        <IoMdClose className="self-center font-semibold text-red-600 text-3xl"/>
+                    </div>
+                    <div className='bg-white p-3 rounded-full cursor-pointer hover:bg-green-50 select-none'
+                        onClick={() => swiped('right', items.slice(-1)[0].items[0].id, items.slice(-1)[0].userId)}>
+                        <IoMdHeart className="self-center font-semibold text-green-400 text-3xl"/>
+                    </div>
                 </div>
-                <div className='bg-white p-3 rounded-full cursor-pointer hover:bg-green-50 select-none'
-                    onClick={() => swiped('right', items.slice(-1)[0].items[0].id)}>
-                    <IoMdHeart className="self-center font-semibold text-green-400 text-3xl"/>
-                </div>
-            </div>
+            }
         </>
     );
   }

@@ -116,7 +116,7 @@ export const Home = () =>{
       <div className="col-span-4 row-span-full bg-[#f0f2f4] flex items-center justify-center">
         {isLoadingUser ? <p>Loading...</p>:
           !!userData && isNotAddingProduct && isNotEditingProduct ?
-          <SwipingMenu /> :
+          <SwipingMenu selectedItem={selectedItem}/> :
             !isNotAddingProduct  && isNotEditingProduct? 
             <CreateItemForm addItemToUser={addItemToUser} setNotAddingProduct={setNotAddingProduct}/> :
               !!userData && !isNotEditingProduct && !!selectedItem ?
