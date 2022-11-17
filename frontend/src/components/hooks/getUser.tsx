@@ -1,16 +1,16 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import React from "react";
+import { useState } from "react";
 import { useQuery } from "react-query";
 import { UserItemsType } from "../screens/home/Home";
 import apiClient from "../shared/htttp-common";
 
 export const useUser = () =>{
     const { user, logout } = useAuth0();
-    const [userData, setUserData] = React.useState<UserItemsType>();
-    const [selectedItem, setSelectedItem] = React.useState<string>("");
-    const [isProductsActive, setProductsActive] = React.useState<boolean>(true);
-    const [isNotAddingProduct, setNotAddingProduct] = React.useState<boolean>(true);
-    const [isNotEditingProduct, setNotEditingProduct] = React.useState<boolean>(true);
+    const [userData, setUserData] = useState<UserItemsType>();
+    const [selectedItem, setSelectedItem] = useState<string>("");
+    const [isProductsActive, setProductsActive] = useState<boolean>(true);
+    const [isNotAddingProduct, setNotAddingProduct] = useState<boolean>(true);
+    const [isNotEditingProduct, setNotEditingProduct] = useState<boolean>(true);
     
     const { isLoading: isLoadingUser, refetch: getUserById} = useQuery(
       "query_user_by_id",

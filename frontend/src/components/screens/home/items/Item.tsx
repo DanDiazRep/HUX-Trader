@@ -1,12 +1,5 @@
-import { ItemType } from "./Home";
-import { AiOutlineEdit } from 'react-icons/ai'
-
-export type ItemsListType = {
-    items: ItemType[],
-    selectedItem: string,
-    setSelectedItem: (id: string) => void,
-    setNotEditingProduct: (toggle: boolean) => void
-};
+import { AiOutlineEdit } from "react-icons/ai";
+import { ItemType } from "../Home";
 
 type ItemCard = {
     item: ItemType,
@@ -15,20 +8,7 @@ type ItemCard = {
     setNotEditingProduct: (toggle: boolean) => void
 }
 
-export const ItemsList = ({items, selectedItem, setSelectedItem, setNotEditingProduct}: ItemsListType) =>{
-    return (
-        <div className="overflow-auto px-4 flex-1">
-            {items?.length > 0 ? 
-                items.map(item => 
-                    <Item key={item.id} item={item} selectedItem={selectedItem} setSelectedItem={setSelectedItem} setNotEditingProduct={setNotEditingProduct}/>
-                ) :
-                <p>You don't have any items yet. Start by clicking the button below!</p>
-            }
-        </div>
-    );
-  }
-
-  export const Item = ({item, selectedItem, setSelectedItem, setNotEditingProduct}: ItemCard) => {
+export const Item = ({item, selectedItem, setSelectedItem, setNotEditingProduct}: ItemCard) => {
     return (
          <div className={`flex flex-row justify-between p-4 px-4 mb-4 shadow cursor-pointer rounded-md ${item.id === selectedItem ? 'border-b border-[#fd2879]' : 'border-b border-transparent'}`}
             onClick={() => setSelectedItem(item.id)}>
@@ -46,4 +26,4 @@ export const ItemsList = ({items, selectedItem, setSelectedItem, setNotEditingPr
             </div>     
         </div>
     );
-  }
+}

@@ -1,29 +1,12 @@
-import { Match } from "./Home"
 import { IoMdClose } from "react-icons/io";
 import { MdOutlineAlternateEmail } from "react-icons/md"
-
-type MatchList = {
-    matches: Match[]
-}
+import { Match } from "../Home";
 
 type MatchItemType = {
     match: Match
 }
 
-export const Matches = ({matches}: MatchList) => {
-    return(
-        <div className="overflow-auto px-4 flex-1">
-            {matches?.length > 0 ? 
-                matches.map(match => 
-                    <MatchItem key={`${match.itemA.url}-${match.itemB.url}`} match={match}/>
-                ) :
-                <p>You don't have any matches yet. Start swiping right on some items!</p>
-            }
-        </div>
-    )
-}
-
-const MatchItem = ({match}: MatchItemType) => {
+export const MatchItem = ({match}: MatchItemType) => {
     return(
         <div className="p-4 px-4 mb-4 shadow rounded-md">
             <div className="flex flex-row justify-between items-center">

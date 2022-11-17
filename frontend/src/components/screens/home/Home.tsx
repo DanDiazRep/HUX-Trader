@@ -1,15 +1,15 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { AxiosResponse } from "axios";
-import React, { createContext } from "react";
+import { createContext, useState, useEffect, Fragment } from "react";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { ImExit } from "react-icons/im";
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useQuery } from "react-query";
 import apiClient from "../../shared/htttp-common";
-import { CreateItemForm} from "./CreateItemForm";
-import { EditItemForm} from "./EditItemForm";
-import { ItemsList } from "./ItemsList";
-import { Matches } from "./Matches";
-import { SwipingMenu } from "./SwipeMenu";
+import { CreateItemForm} from "./forms/CreateItemForm";
+import { EditItemForm} from "./forms/EditItemForm";
+import { ItemsList } from "./items/ItemsList";
+import { Matches } from "./matches/MatchesList";
+import { SwipeSection } from "./SwipeSection";
 // This will be the main logged in / swiping screen
 
 export type UserItemsType = {
@@ -49,13 +49,13 @@ export const UserContext = createContext<UserContextType>({refetch: undefined});
 
 export const Home = () =>{
   const { user, logout } = useAuth0();
-  const [userData, setUserData] = React.useState<UserItemsType>();
-  const [selectedItem, setSelectedItem] = React.useState<string>("");
-  const [isProductsActive, setProductsActive] = React.useState<boolean>(true);
-  const [isNotAddingProduct, setNotAddingProduct] = React.useState<boolean>(true);
-  const [isNotEditingProduct, setNotEditingProduct] = React.useState<boolean>(true);
-  const [matches, setMatches] = React.useState<Match[]>([])
-  const [pingMatches, setPingMatches] = React.useState<boolean>(false)
+  const [userData, setUserData] = useState<UserItemsType>();
+  const [selectedItem, setSelectedItem] = useState<string>("");
+  const [isProductsActive, setProductsActive] = useState<boolean>(true);
+  const [isNotAddingProduct, setNotAddingProduct] = useState<boolean>(true);
+  const [isNotEditingProduct, setNotEditingProduct] = useState<boolean>(true);
+  const [matches, setMatches] = useState<Match[]>([])
+  const [pingMatches, setPingMatches] = useState<boolean>(false)
   
   const { isLoading: isLoadingUser, refetch: getUserById} = useQuery(
     "query_user_by_id",
@@ -89,7 +89,7 @@ export const Home = () =>{
     }
   );
 
-  const { isLoading: isLoadingMatches, refetch: getMatchesByUser} = useQuery(
+  const { refetch: getMatchesByUser} = useQuery(
     "query_matches_by_user",
     async () => {
       if(user){
@@ -111,11 +111,11 @@ export const Home = () =>{
     }
   );
 
- React.useEffect(() => {
+ useEffect(() => {
   getUserById();
  }, [getUserById])
 
- React.useEffect(() => {
+ useEffect(() => {
   getMatchesByUser()
 
   let interval = setInterval(() => {
@@ -167,12 +167,12 @@ export const Home = () =>{
             isLoadingUser ? 
               <p>Loading...</p>:
             !!userData ?
-              <>
+              <Fragment>
                 <ItemsList items={userData.items} selectedItem={selectedItem} setSelectedItem={(id: string) => setSelectedItem(id)} setNotEditingProduct={setNotEditingProduct}/> 
                 <button onClick={()=> setNotAddingProduct(false)}className="flex w-full justify-center p-4 px-4 shadow bg-gradient-to-r from-sky-500 to-indigo-500">
                   <AiOutlinePlusCircle className="text-white" size= {40}/>
                 </button>
-              </>
+              </Fragment>
             : 
               <p>No items available</p> : <Matches matches={matches}/>
         }
@@ -181,7 +181,7 @@ export const Home = () =>{
       <div className="col-span-4 row-span-full bg-[#f0f2f4] flex items-center justify-center">
         {isLoadingUser ? <p>Loading...</p>:
           !!userData && isNotAddingProduct && isNotEditingProduct ?
-          <SwipingMenu selectedItem={selectedItem} getMatches={getMatchesByUser}/> :
+          <SwipeSection selectedItem={selectedItem} getMatches={getMatchesByUser}/> :
             !isNotAddingProduct  && isNotEditingProduct? 
             <CreateItemForm addItemToUser={addItemToUser} setNotAddingProduct={setNotAddingProduct}/> :
               !!userData && !isNotEditingProduct && !!selectedItem ?

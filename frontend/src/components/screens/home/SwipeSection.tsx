@@ -1,4 +1,4 @@
-import React from 'react'
+import {useState, useEffect, Fragment} from 'react'
 import TinderCard from 'react-tinder-card'
 import { useQuery } from "react-query";
 import apiClient from "../../shared/htttp-common";
@@ -16,14 +16,14 @@ type Match = {
     urlB: string,
 }
 
-export const SwipingMenu = (props: Props) => {
+export const SwipeSection = (props: Props) => {
     const { user } = useAuth0();
-    const [items, setItems] = React.useState<UserItemsType[]>([])
-    const [lastSwiped, setLastSwiped] = React.useState<string>("")
-    const [matched, setMatched] = React.useState<boolean>(false)
-    const [match, setMatch] = React.useState<Match>()
+    const [items, setItems] = useState<UserItemsType[]>([])
+    const [lastSwiped, setLastSwiped] = useState<string>("")
+    const [matched, setMatched] = useState<boolean>(false)
+    const [match, setMatch] = useState<Match>()
 
-    const { isLoading: isLoadingItems, refetch: getRandomItems, isFetching: isFetchingNewItems } = useQuery(
+    const { refetch: getRandomItems, isFetching: isFetchingNewItems } = useQuery(
         "query_random_items",
         async () => {
             if(user && user.sub){
@@ -52,13 +52,13 @@ export const SwipingMenu = (props: Props) => {
         }
     );
     
-    React.useEffect(() => {
+    useEffect(() => {
         if(items.length <= 1){
             getRandomItems()
         }
     }, [getRandomItems, items.length])
 
-    React.useEffect(() => {
+    useEffect(() => {
         setLastSwiped("")
         setItems([])
         setTimeout(() => {
@@ -104,7 +104,7 @@ export const SwipingMenu = (props: Props) => {
     }
 
     return (
-        <>
+        <Fragment>
             <div className="flex flex-col p-8 h-max justify-center relative">
                 {items.length > 0 && items.map((record) =>
                     <div key={record.items[0].id + '|' + Math.random() + Math.random()} className='absolute swipeable select-none'>
@@ -146,7 +146,7 @@ export const SwipingMenu = (props: Props) => {
             }
             {
                 matched &&
-                <>
+                <Fragment>
                     <div className='fadeIn blur absolute w-full h-full left-0'>
                     </div>
                     <div className='fadeIn absolute bg-black bg-opacity-80 w-full h-full left-0 flex flex-col justify-center items-center'>
@@ -164,8 +164,8 @@ export const SwipingMenu = (props: Props) => {
                             Continue
                         </button>
                     </div>
-                </>
+                </Fragment>
             }
-        </>
+        </Fragment>
     );
   }
