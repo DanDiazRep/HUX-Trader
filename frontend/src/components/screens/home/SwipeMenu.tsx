@@ -15,7 +15,7 @@ export const SwipingMenu = (props: Props) => {
     const [items, setItems] = React.useState<UserItemsType[]>([])
     const [lastSwiped, setLastSwiped] = React.useState<string>("")
 
-    const { isLoading: isLoadingItems, refetch: getRandomItems } = useQuery(
+    const { isLoading: isLoadingItems, refetch: getRandomItems, isFetching: isFetchingNewItems } = useQuery(
         "query_random_items",
         async () => {
             if(user && user.sub){
@@ -100,7 +100,7 @@ export const SwipingMenu = (props: Props) => {
                     </div>
                 )}
                 {
-                    items.length === 0 &&
+                    !isFetchingNewItems && items.length === 0 &&
                     <p>We don't have any more items for you right now.</p>
                 }
             </div>

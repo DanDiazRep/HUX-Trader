@@ -41,33 +41,31 @@ export const EditItemForm = ({setNotEditingProduct, editedItem}: Props) =>{
           }
         };    
 
-      const deleteItem = async () => {
-          if(!!user?.sub && !!editedItem.id){
-            let data = new FormData()
-            data.append("userId", user.sub);  
-            data.append("itemId", editedItem.id);           
+    const deleteItem = async () => {
+        if(!!user?.sub && !!editedItem.id){
+          let data = new FormData()
+          data.append("userId", user.sub);  
+          data.append("itemId", editedItem.id);           
 
-            return await apiClient.patch(`/delete`, data)            
-            .then((res) => {        
-              console.log("item deleted");            
-              setNotEditingProduct(true);
-              if (getUserById) 
-              getUserById();
-          })
-          .catch((err) => {
-            
-            console.log("ERROR DELETING ITEM",err);
+          return await apiClient.patch(`/delete`, data)            
+          .then((res) => {                
+            setNotEditingProduct(true);
             if (getUserById) 
-              getUserById();
-          })
-          }        
-      };      
-    
-    
-      useEffect(() => {
-        setName(editedItem.name);
-        setDescription(editedItem.description);
-      }, [editedItem]); 
+            getUserById();
+        })
+        .catch((err) => {
+          console.log("ERROR DELETING ITEM",err);
+          if (getUserById) 
+            getUserById();
+        })
+        }        
+    };      
+  
+  
+    useEffect(() => {
+      setName(editedItem.name);
+      setDescription(editedItem.description);
+    }, [editedItem]); 
 
     return (
       <>

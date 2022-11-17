@@ -93,7 +93,6 @@ app.patch('/delete', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image
     const result = users.updateOne(
         {
             userId: userId,
-            "items.id": itemId
         }, 
         {
             $pull: { "items" : { "id" :  itemId } } 
@@ -105,7 +104,6 @@ app.patch('/delete', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image
     } else{
         res.sendStatus(500)
     }
-    
 })
 
 app.get('/items/:id/:currentItemId?/:lastItemId?', async (req, res) => {
