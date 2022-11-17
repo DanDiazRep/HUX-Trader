@@ -1,4 +1,4 @@
-import { MdOutlineAlternateEmail } from "react-icons/md"
+import { TbMail } from "react-icons/tb"
 import { Match } from "../Home";
 
 type MatchItemType = {
@@ -25,7 +25,7 @@ export const MatchItem = ({match}: MatchItemType) => {
                 </div>
             </div>
             <div className="mt-5 flex gap-2 items-center overflow-hidden">
-                <MdOutlineAlternateEmail color="grey"/>
+                <TbMail color="grey"/>
                 <a href={`mailto:${match.contact}`} className="pb-1 text-gray-600 max-w-[90%]">{match.contact}</a>
             </div>
         </div>
