@@ -22,6 +22,7 @@ export const SwipeSection = (props: Props) => {
     const [lastSwiped, setLastSwiped] = useState<string>("")
     const [matched, setMatched] = useState<boolean>(false)
     const [match, setMatch] = useState<Match>()
+    const [forceRefetch, setForceRefetch] = useState<number>()
 
     const { refetch: getRandomItems, isFetching: isFetchingNewItems } = useQuery(
         "query_random_items",
@@ -56,14 +57,12 @@ export const SwipeSection = (props: Props) => {
         if(items.length <= 1){
             getRandomItems()
         }
-    }, [getRandomItems, items.length])
+    }, [getRandomItems, items.length, forceRefetch])
 
     useEffect(() => {
         setLastSwiped("")
         setItems([])
-        setTimeout(() => {
-            getRandomItems()
-        }, 100)
+        setForceRefetch(new Date().getMilliseconds())
     }, [props.selectedItem, getRandomItems])
 
     const swiped = (direction: string, itemId: string, userId: string) => {
