@@ -5,6 +5,7 @@ import { AiOutlinePlusCircle } from "react-icons/ai";
 import { ImExit } from "react-icons/im";
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useQuery } from "react-query";
 import apiClient from "../../shared/htttp-common";
+import { EditButton } from "./EditButton";
 import { CreateItemForm} from "./forms/CreateItemForm";
 import { EditItemForm} from "./forms/EditItemForm";
 import { ItemsList } from "./items/ItemsList";
@@ -169,9 +170,7 @@ export const Home = () =>{
             !!userData ?
               <Fragment>
                 <ItemsList items={userData.items} selectedItem={selectedItem} setSelectedItem={(id: string) => setSelectedItem(id)} setNotEditingProduct={setNotEditingProduct}/> 
-                <button onClick={()=> setNotAddingProduct(false)}className="flex w-full justify-center p-4 px-4 shadow bg-gradient-to-r from-sky-500 to-indigo-500">
-                  <AiOutlinePlusCircle className="text-white" size= {40}/>
-                </button>
+                <EditButton action={()=> setNotAddingProduct(false)}/>
               </Fragment>
             : 
               <p>No items available</p> : <Matches matches={matches}/>
