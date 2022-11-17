@@ -128,7 +128,7 @@ export const SwipeSection = (props: Props) => {
                 )}
                 {
                     !isFetchingNewItems && items.length === 0 &&
-                    <p>We don't have any more items for you right now.</p>
+                    <p className='bg-white py-3 px-5 rounded-md'>We don't have any more items for you right now.</p>
                 }
             </div>
             {
