@@ -91,12 +91,9 @@ app.patch('/delete', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image
     let itemId = req.body.itemId;
 
     const result = users.updateOne(
+        { userId: userId }, 
         {
-            userId: userId,
-        }, 
-        {
-            $pull: { "items" : { "id" :  itemId } } 
-
+            $pull: { "items": { "id":  itemId } } 
         });
 
     if(result){
@@ -106,23 +103,25 @@ app.patch('/delete', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image
     }
 })
 
-app.get('/items/:id/:currentItemId?/:lastItemId?', async (req, res) => {
+app.get('/items/:id/:selectedItemId/:currentItemId?/:lastItemId?', async (req, res) => {
     let id = req.params.id
+    let selectedItemId = req.params.selectedItemId
     try {
         const database = client.db('trader');
         const users = database.collection('users');
         const user = await users.findOne({userId: id})
 
-        let likes = user.likes
-        let dislikes = user.dislikes
+        let likes = user.items.filter((item) => item.id === selectedItemId)[0].likes
+        let dislikes = user.items.filter((item) => item.id === selectedItemId)[0].dislikes
         let matches = []
-        if(user.matches) matches = user.matches.map((item) => {return item.itemId})
+        if(user.items.filter((item) => item.id === selectedItemId)[0].matches) matches = user.items.filter((item) => item.id === selectedItemId)[0].matches.map((item) => {return item.itemId})
         if(!likes) likes = []
         if(!dislikes) dislikes = []
 
         let blacklist = likes.concat(dislikes, matches)
         if(req.params.currentItemId) blacklist.push(req.params.currentItemId)
         if(req.params.lastItemId) blacklist.push(req.params.lastItemId)
+
         const result = users.aggregate([
             {
               '$unwind': {
@@ -133,7 +132,7 @@ app.get('/items/:id/:currentItemId?/:lastItemId?', async (req, res) => {
                 '$and': [
                   {
                     'userId': {
-                      '$ne': 'auth0|6367afee283a168328bba502'
+                      '$ne': req.params.id
                     }
                   }, {
                     'items.id': {
@@ -146,6 +145,12 @@ app.get('/items/:id/:currentItemId?/:lastItemId?', async (req, res) => {
               '$sample': {
                 'size': 3
               }
+            }, {
+                '$project': {
+                    "items.dislikes": 0,
+                    "items.likes": 0,
+                    "items.matches": 0
+                }
             }
           ])
         let items = []
@@ -182,8 +187,8 @@ app.post('/swipe', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image')
     let direction = req.body.direction
 
     const userB = await users.findOne({userId: idB})
-    let likes = userB.likes
-    let dislikes = userB.dislikes
+    let likes = userB.items.filter((item) => item.id === itemB)[0].likes
+    let dislikes = userB.items.filter((item) => item.id === itemB)[0].dislikes
     if(!likes) likes = []
     if(!dislikes) dislikes = []
 
@@ -192,21 +197,63 @@ app.post('/swipe', multer({limits: {fileSize: 5 * 1024 * 1024}}).single('image')
 
         //B doesn't -> Add B to A.likes
         if(!likes.includes(itemA) && !dislikes.includes(itemA)){
-            await users.updateOne({userId: idA}, {$addToSet: {likes: itemB}}, {upsert: true});
+            await users.updateOne({userId: idA, "items.id": itemA}, {$addToSet: {"items.$.likes": itemB}}, {upsert: true});
+            res.sendStatus(200)
         }
         //B does -> Add each other to matches and remove from likes array
         if(likes.includes(itemA)){
-            await users.updateOne({userId: idA}, {$addToSet: {matches: {userId: idB, itemId: itemB}}}, {upsert: true});
-            await users.updateOne({userId: idB}, {$addToSet: {matches: {userId: idA, itemId: itemA}}}, {upsert: true});
+            await users.updateOne({userId: idA, "items.id": itemA}, {$addToSet: {"items.$.matches": {userId: idB, itemId: itemB}}}, {upsert: true});
+            await users.updateOne({userId: idB, "items.id": itemB}, {$addToSet: {"items.$.matches": {userId: idA, itemId: itemA}}}, {upsert: true});
 
-            await users.updateOne({userId: idA}, {$pull: {likes: {$eq: itemB}}});
-            await users.updateOne({userId: idB}, {$pull: {likes: {$eq: itemA}}});
+            await users.updateOne({userId: idA, "items.id": itemA}, {$pull: {"items.$.likes": {$eq: itemB}}});
+            await users.updateOne({userId: idB, "items.id": itemB}, {$pull: {"items.$.likes": {$eq: itemA}}});
+
+            const resultA = await users.findOne({userId: idA, "items.id": itemA});
+            const resultB = await users.findOne({userId: idB, "items.id": itemB});
+
+            res.send({
+                match: true,
+                urlA: resultA.items.filter((item) => item.id === itemA)[0].url,
+                urlB: resultB.items.filter((item) => item.id === itemB)[0].url,
+            })
         }
     } else if(direction == 'left'){
-        await users.updateOne({userId: idA}, {$addToSet: {dislikes: itemB}}, {upsert: true});
+        await users.updateOne({userId: idA, "items.id": itemA}, {$addToSet: {"items.$.dislikes": itemB}}, {upsert: true});
+        res.sendStatus(200)
+    }
+})
+
+app.get('/matches/:id', async (req, res) => {
+    let id = req.params.id
+    let user = await getFullUser(id)
+    let matches = []
+
+    for await(let item of user.items){
+        if(item.matches?.length > 0){
+            for await(let match of item.matches){
+                let userB = await getFullUser(match.userId)
+                let itemB = userB.items.filter((item) => item.id === match.itemId)[0]
+
+                if(!itemB) return
+
+                let obj = {
+                    itemA: {
+                        url: item.url,
+                        name: item.name
+                    },
+                    itemB: {
+                        url: itemB.url,
+                        name: itemB.name
+                    },
+                    contact: userB.email
+                }
+
+                matches.push(obj)
+            }
+        }
     }
 
-    res.sendStatus(200)
+    res.send(matches)
 })
 
 app.listen(port, () => {
@@ -268,8 +315,25 @@ async function getUser(userId){
     try {
         const database = client.db('trader');
         const users = database.collection('users');
-        const filter = { userId };
-        const user = await users.findOne(filter);
+        const user = await users.findOne({userId}, {
+            projection: {
+                "items.dislikes": 0,
+                "items.likes": 0,
+                "items.matches": 0
+            }
+        });
+        
+        return user
+    } catch(e){
+        return e
+    }
+}
+
+async function getFullUser(userId){
+    try {
+        const database = client.db('trader');
+        const users = database.collection('users');
+        const user = await users.findOne({userId});
         
         return user
     } catch(e){

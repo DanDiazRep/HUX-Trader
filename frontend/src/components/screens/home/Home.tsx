@@ -8,6 +8,7 @@ import apiClient from "../../shared/htttp-common";
 import { CreateItemForm} from "./CreateItemForm";
 import { EditItemForm} from "./EditItemForm";
 import { ItemsList } from "./ItemsList";
+import { Matches } from "./Matches";
 import { SwipingMenu } from "./SwipeMenu";
 // This will be the main logged in / swiping screen
 
@@ -25,6 +26,18 @@ export type ItemType = {
   description: string,
 };
 
+export type Match = {
+  itemA: {
+    url: string,
+    name: string
+  },
+  itemB: {
+    url: string,
+    name: string
+  },
+  contact: string
+}
+
 export type UserContextType = {
 refetch: undefined | (<TPageData>(options?: 
   (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined) => 
@@ -41,6 +54,8 @@ export const Home = () =>{
   const [isProductsActive, setProductsActive] = React.useState<boolean>(true);
   const [isNotAddingProduct, setNotAddingProduct] = React.useState<boolean>(true);
   const [isNotEditingProduct, setNotEditingProduct] = React.useState<boolean>(true);
+  const [matches, setMatches] = React.useState<Match[]>([])
+  const [pingMatches, setPingMatches] = React.useState<boolean>(false)
   
   const { isLoading: isLoadingUser, refetch: getUserById} = useQuery(
     "query_user_by_id",
@@ -74,9 +89,43 @@ export const Home = () =>{
     }
   );
 
+  const { isLoading: isLoadingMatches, refetch: getMatchesByUser} = useQuery(
+    "query_matches_by_user",
+    async () => {
+      if(user){
+        return await apiClient.get(`/matches/${user.sub}`);
+      }
+    },
+    {
+      enabled: false,
+      retry: 1,
+      onSuccess: (res) => {
+        if (res) {
+          if(res.data.length > matches.length && isProductsActive) setPingMatches(true)
+          setMatches(res.data)
+        }
+      },
+      onError: (err) => {
+        console.log("ERROR",err);
+      },
+    }
+  );
+
  React.useEffect(() => {
   getUserById();
  }, [getUserById])
+
+ React.useEffect(() => {
+  getMatchesByUser()
+
+  let interval = setInterval(() => {
+    getMatchesByUser()
+  }, 10000)
+
+  return () => {
+    clearInterval(interval)
+  }
+ }, [])
 
  const addItemToUser = (item: ItemType) => {
   if(userData){
@@ -102,10 +151,16 @@ export const Home = () =>{
           </div>     
         </div>
         <div className="flex flex-row py-2 pb-3 mx-4">
-          <button className={`font-semibold mr-6 ${isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
+          <button className={`font-semibold mr-5 ${isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
                   onClick={() => setProductsActive(true)}>Products</button>
-          <button className={`font-semibold ${!isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
-                  onClick={() => setProductsActive(false)}>Trades</button>
+          <button className={`font-semibold relative ${!isProductsActive && 'underline decoration-[#fd2879] decoration-4 underline-offset-4'}`}
+                  onClick={() => {
+                    setProductsActive(false)
+                    setPingMatches(false)
+                  }}>
+                    Matches
+                  { pingMatches && <span className="ping animate-pulse"/> }
+          </button>
         </div>
         
         {isProductsActive ? 
@@ -119,14 +174,14 @@ export const Home = () =>{
                 </button>
               </>
             : 
-              <p>No items available</p> : <p className="px-4">Coming soon...</p>
+              <p>No items available</p> : <Matches matches={matches}/>
         }
       </div>
 
       <div className="col-span-4 row-span-full bg-[#f0f2f4] flex items-center justify-center">
         {isLoadingUser ? <p>Loading...</p>:
           !!userData && isNotAddingProduct && isNotEditingProduct ?
-          <SwipingMenu selectedItem={selectedItem}/> :
+          <SwipingMenu selectedItem={selectedItem} getMatches={getMatchesByUser}/> :
             !isNotAddingProduct  && isNotEditingProduct? 
             <CreateItemForm addItemToUser={addItemToUser} setNotAddingProduct={setNotAddingProduct}/> :
               !!userData && !isNotEditingProduct && !!selectedItem ?

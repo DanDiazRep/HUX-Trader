@@ -7,22 +7,30 @@ import { UserItemsType } from './Home';
 import { IoMdClose, IoMdHeart } from "react-icons/io";
 
 interface Props{
-    selectedItem: string
+    selectedItem: string,
+    getMatches: () => void
+}
+
+type Match = {
+    urlA: string,
+    urlB: string,
 }
 
 export const SwipingMenu = (props: Props) => {
     const { user } = useAuth0();
     const [items, setItems] = React.useState<UserItemsType[]>([])
     const [lastSwiped, setLastSwiped] = React.useState<string>("")
+    const [matched, setMatched] = React.useState<boolean>(false)
+    const [match, setMatch] = React.useState<Match>()
 
     const { isLoading: isLoadingItems, refetch: getRandomItems, isFetching: isFetchingNewItems } = useQuery(
         "query_random_items",
         async () => {
             if(user && user.sub){
-                if(items.length > 0){
-                    return await apiClient.get(`/items/${user.sub}/${items.slice(-1)[0].items[0].id}/${lastSwiped}`);
+                if(items.length > 0 && lastSwiped !== ""){
+                    return await apiClient.get(`/items/${user.sub}/${props.selectedItem}/${items.slice(-1)[0].items[0].id}/${lastSwiped}`);
                 } else if(items.length === 0 && lastSwiped === ""){
-                    return await apiClient.get(`/items/${user.sub}`);
+                    return await apiClient.get(`/items/${user.sub}/${props.selectedItem}`);
                 }
             }
         },
@@ -50,6 +58,14 @@ export const SwipingMenu = (props: Props) => {
         }
     }, [getRandomItems, items.length])
 
+    React.useEffect(() => {
+        setLastSwiped("")
+        setItems([])
+        setTimeout(() => {
+            getRandomItems()
+        }, 100)
+    }, [props.selectedItem, getRandomItems])
+
     const swiped = (direction: string, itemId: string, userId: string) => {
         if(itemId.split('|')[0] === items.slice(-1)[0].items[0].id){
             setLastSwiped(itemId)
@@ -63,12 +79,23 @@ export const SwipingMenu = (props: Props) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userA: user!.sub,
-                    itemA: props.selectedItem,
-                    userB: userId,
-                    itemB: itemId,
-                    direction
-                }),
+                        userA: user!.sub,
+                        itemA: props.selectedItem,
+                        userB: userId,
+                        itemB: itemId,
+                        direction
+                    }),
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    if(data.match){
+                        setMatch({
+                            urlA: data.urlA,
+                            urlB: data.urlB
+                        })
+                        setMatched(true)
+                        props.getMatches()
+                    }
                 })
                 .catch((error) => {
                     console.error('Error:', error);
@@ -116,6 +143,28 @@ export const SwipingMenu = (props: Props) => {
                         <IoMdHeart className="self-center font-semibold text-green-400 text-3xl"/>
                     </div>
                 </div>
+            }
+            {
+                matched &&
+                <>
+                    <div className='fadeIn blur absolute w-full h-full left-0'>
+                    </div>
+                    <div className='fadeIn absolute bg-black bg-opacity-80 w-full h-full left-0 flex flex-col justify-center items-center'>
+                        <div className='slideDown text-green-400 font-extrabold italic flex flex-col items-center'>
+                            <p className='text-4xl'>IT'S A</p>
+                            <p className='text-6xl'>MATCH!</p>
+                        </div>
+                        <p className='slideDown text-white mt-3 mb-14 font-light'>You have found a potential trade!</p>
+                        <div className='flex items-center gap-10'>
+                            <img className='slideRight w-52 h-52 object-cover rounded-full border-2 border-white' src={match?.urlA} alt="itemA"/>
+                            <img className='slideLeft w-52 h-52 object-cover rounded-full border-2 border-white' src={match?.urlB} alt="itemB"/>
+                        </div>
+                        <button className="slideUp mt-14 bg-gradient-to-r from-[#fd2879] to-[#ff8941] bg-opacity-5 px-14 py-2 rounded-md font-semibold text-white text-lg"
+                            onClick={() => setMatched(false)}>
+                            Continue
+                        </button>
+                    </div>
+                </>
             }
         </>
     );

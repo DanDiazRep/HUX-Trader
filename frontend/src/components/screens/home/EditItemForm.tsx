@@ -116,7 +116,7 @@ export const EditItemForm = ({setNotEditingProduct, editedItem}: Props) =>{
           { !!description && !!name &&
             <button type="button" 
             className="text-white py-2 px-4 font-semibold rounded-md bg-gradient-to-tr from-[#fd2879] to-[#ff8941]" 
-            onClick={(e) => editItem()}>Edit</button>
+            onClick={(e) => editItem()}>Save</button>
           }
             <button type="button" 
             className="py-2 px-4 font-semibold rounded-md bg-gray-300 text-black" 
